@@ -24,7 +24,7 @@ app.use(bodyParser.json());
 
 app.use("/", routes);
 app.get('/user',(req,res)=>{
-    res.json({
+   return res.json({
         success:true,
         message:"uuserrrssss fetched"
     })
