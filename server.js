@@ -26,7 +26,7 @@ app.use("/", routes);
 
 
 mongoose
-  .connect(MONGO_URL)
+  .connect("mongodb+srv://anuragyadav:xaFGgUXPDJe5YLUW@cluster0.ykk6k.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
   .then(() => {
     console.log("Connected to MongoDB");
     app.listen(PORT, () => {
