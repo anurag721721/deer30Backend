@@ -23,6 +23,12 @@ app.use(express.json());
 app.use(bodyParser.json());
 
 app.use("/", routes);
+app.get('/user',(req,res)=>{
+    res.json({
+        success:true,
+        message:"uuserrrssss fetched"
+    })
+})
 
 
 mongoose

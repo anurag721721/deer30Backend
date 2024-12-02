@@ -114,14 +114,13 @@ const userLogin = async (req, res) => {
     const passwordmatched = await bcrypt.compare(
       password,
       existingUser.password
-    );
-    console.log("hashedPassword", passwordmatched);
-
+    )
     // Respond with success
     if (passwordmatched) {
+      console.log("login successful")
       return res.status(200).json({
         success: true,
-        message: "Login successful!",
+        message: "Login successfull!",
       });
     } else {
       return res.status(403).json({
