@@ -7,7 +7,7 @@ const routes=require('./routes')
 const bodyParser = require("body-parser");
 const app = express();
 
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 9876;
 const MONGO_URL = process.env.MONGO_URL;
 
 const corsOptions = {
