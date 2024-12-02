@@ -114,10 +114,10 @@ const userLogin = async (req, res) => {
     const passwordmatched = await bcrypt.compare(
       password,
       existingUser.password
-    )
+    );
     // Respond with success
     if (passwordmatched) {
-      console.log("login successful")
+      console.log("login successful");
       return res.status(200).json({
         success: true,
         message: "Login successfull!",
@@ -136,5 +136,68 @@ const userLogin = async (req, res) => {
     });
   }
 };
+const forgetPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
 
-module.exports = { userSignUp, userLogin, userVerify };
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res
+        .status(400)
+        .json({ message: "User with this email does not exist" });
+    }
+    console.log("into forget password");
+    const newVerificationCode = Math.floor(
+      1000 + Math.random() * 9000
+    ).toString();
+    const newVerificationCodeExpires = new Date(Date.now() + 15 * 60 * 1000);
+
+    user.verificationCode = newVerificationCode;
+    user.verificationCodeExpires = newVerificationCodeExpires;
+
+    await user.save();
+
+    const subject = "Password Reset OTP";
+    const message = `Your password reset OTP is: ${newVerificationCode}. Please use this OTP to reset your password. This OTP is valid for 15 minutes.`;
+
+    await sendEmail(user.email, subject, message);
+
+    res
+      .status(200)
+      .json({ message: "OTP sent to your email for password reset" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+const changePassword = async (req, res) => {
+  try {
+    const { password, otp } = req.body;
+    const { userId } = req.params;
+
+    const users = await User.findById({ _id: userId });
+    if (!users) return res.status(404).send({ message: "user not found" });
+    if (users.verificationCode === otp) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      users.password = hashedPassword;
+
+      await users.save();
+      res.status(200).json({ message: "Password changed" });
+    }
+    else{
+      return res.status(403).json({
+        success:false,
+        message:"Please Provide Valid OTP"
+      })
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = {
+  userSignUp,
+  userLogin,
+  userVerify,
+  forgetPassword,
+  changePassword,
+};

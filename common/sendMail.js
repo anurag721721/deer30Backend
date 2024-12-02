@@ -1,12 +1,18 @@
-const nodemailer = require('nodemailer');
+const nodemailer = require("nodemailer");
+
+require("dotenv").config();
 
 const sendEmail = async (recipient, subject, message) => {
+  console.log("sendmail", process.env.EMAIL_USER, process.env.EMAIL_PASS);
   try {
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
+      service: "gmail",
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
+      },
+      tls: {
+        rejectUnauthorized: false, // Ignore certificate validation errors
       },
     });
 
@@ -19,8 +25,7 @@ const sendEmail = async (recipient, subject, message) => {
 
     await transporter.sendMail(mailOptions);
   } catch (error) {
-    console.error('Error sending email:', error);
-    
+    console.error("Error sending email:", error);
   }
 };
 
