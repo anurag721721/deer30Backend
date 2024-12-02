@@ -169,25 +169,44 @@ const forgetPassword = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-const changePassword = async (req, res) => {
+const verifyOtp = async (req, res) => {
   try {
-    const { password, otp } = req.body;
+    const { otp } = req.body;
     const { userId } = req.params;
 
     const users = await User.findById({ _id: userId });
     if (!users) return res.status(404).send({ message: "user not found" });
     if (users.verificationCode === otp) {
-      const hashedPassword = await bcrypt.hash(password, 10);
-      users.password = hashedPassword;
-
-      await users.save();
-      res.status(200).json({ message: "Password changed" });
-    }
-    else{
+      return res.status(200).json({
+        success: true,
+        message: "OTP Verified, Please Reset Your Password",
+      });
+    } else {
       return res.status(403).json({
-        success:false,
-        message:"Please Provide Valid OTP"
-      })
+        success: false,
+        message: "Please Provide Valid OTP",
+      });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+const changePassword = async (req, res) => {
+  try {
+    const { password } = req.body;
+    const { userId } = req.params;
+
+    const users = await User.findById({ _id: userId });
+    if (!users) return res.status(404).send({ message: "user not found" });
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    users.password = hashedPassword;
+
+    const updated = await users.save();
+    if (updated) {
+      res
+        .status(200)
+        .json({ success: true, message: "Password changed successfully" });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -199,5 +218,6 @@ module.exports = {
   userLogin,
   userVerify,
   forgetPassword,
+  verifyOtp,
   changePassword,
 };
