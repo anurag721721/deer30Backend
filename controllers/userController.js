@@ -118,6 +118,11 @@ const userLogin = async (req, res) => {
     // Respond with success
     if (passwordmatched) {
       console.log("login successful");
+      const token = jwt.sign(
+        { id: existingUser._id, email: existingUser.email, userType: existingUser.userType },
+        process.env.JWT_SECRET,
+        { expiresIn: '1h' }
+    );
       return res.status(200).json({
         success: true,
         message: "Login successfull!",
