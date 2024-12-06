@@ -1,6 +1,7 @@
 const sendEmail = require("../common/sendMail");
 const User = require("../models/UserModel");
 const bcrypt = require("bcrypt");
+const jwt=require("jsonwebtoken")
 require("dotenv").config();
 
 const sendVerificationEmail = async (email, verificationCode) => {
@@ -11,7 +12,7 @@ const sendVerificationEmail = async (email, verificationCode) => {
 
 const userSignUp = async (req, res) => {
   try {
-    const { fullName, password, email } = req.body;
+    const { fullName, password, email, userType } = req.body;
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -23,7 +24,7 @@ const userSignUp = async (req, res) => {
     }
 
     // Validate inputs
-    if (!fullName || !password || !email) {
+    if (!fullName || !password || !email || !userType) {
       return res.status(403).json({
         success: false,
         message: "Please fill all the fields",
@@ -38,12 +39,13 @@ const userSignUp = async (req, res) => {
     // Generate verification code for verifcation of hte email
     const verificationCode = Math.floor(1000 + Math.random() * 9000).toString();
     const verificationCodeExpires = new Date(Date.now() + 15 * 60 * 1000);
+    sendVerificationEmail(email, verificationCode);
 
-    sendVerificationEmail(verificationCode);
     // Create and save the new user
     const newUser = new User({
       fullName,
       email,
+      userType,
       password: hashedPassword,
       verificationCode,
       verificationCodeExpires,
@@ -73,7 +75,7 @@ const userVerify = async (req, res) => {
     if (!user) {
       return res.status(400).json({ message: "User not found" });
     }
-
+    console.log("codes", user.verificationCode, verificationCode);
     if (user.verificationCode !== verificationCode) {
       return res.status(400).json({ message: "Invalid verification code" });
     }
@@ -119,13 +121,23 @@ const userLogin = async (req, res) => {
     if (passwordmatched) {
       console.log("login successful");
       const token = jwt.sign(
-        { id: existingUser._id, email: existingUser.email, userType: existingUser.userType },
+        {
+          id: existingUser._id,
+          email: existingUser.email,
+          userType: existingUser.userType,
+        },
         process.env.JWT_SECRET,
-        { expiresIn: '1h' }
-    );
+        { expiresIn: "1h" }
+      );
       return res.status(200).json({
         success: true,
         message: "Login successfull!",
+        token,
+        data: {
+          id: existingUser._id,
+          email: existingUser.email,
+          userType: existingUser.userType,
+        },
       });
     } else {
       return res.status(403).json({

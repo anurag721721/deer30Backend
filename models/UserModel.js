@@ -35,6 +35,7 @@ const userSchema = new mongoose.Schema(
     userType: {
       type: String,
       enum: ["Customer", "Vendor", "Admin"],
+      required:true
     },
     verificationCodeExpires: {
       type: Date,
