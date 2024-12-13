@@ -188,10 +188,10 @@ const forgetPassword = async (req, res) => {
 };
 const verifyOtp = async (req, res) => {
   try {
-    const { otp } = req.body;
-    const { userId } = req.params;
+    const { email,otp } = req.body;
+    
 
-    const users = await User.findById({ _id: userId });
+    const users = await User.find({ email});
     if (!users) return res.status(404).send({ message: "user not found" });
     if (users.verificationCode === otp) {
       return res.status(200).json({
