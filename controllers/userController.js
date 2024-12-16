@@ -1,7 +1,7 @@
 const sendEmail = require("../common/sendMail");
 const User = require("../models/UserModel");
 const bcrypt = require("bcrypt");
-const jwt=require("jsonwebtoken")
+const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 const sendVerificationEmail = async (email, verificationCode) => {
@@ -163,7 +163,7 @@ const forgetPassword = async (req, res) => {
         .status(400)
         .json({ message: "User with this email does not exist" });
     }
-    console.log("into forget password");
+    // console.log("into forget password");
     const newVerificationCode = Math.floor(
       1000 + Math.random() * 9000
     ).toString();
@@ -179,7 +179,7 @@ const forgetPassword = async (req, res) => {
 
     await sendEmail(user.email, subject, message);
 
-    res
+    return res
       .status(200)
       .json({ message: "OTP sent to your email for password reset" });
   } catch (error) {
@@ -188,8 +188,7 @@ const forgetPassword = async (req, res) => {
 };
 const verifyOtp = async (req, res) => {
   try {
-    const { email,otp } = req.body;
-    
+    const { email, otp } = req.body;
 
     const users = await User.findOne({ email});
     if (!users) return res.status(404).send({ message: "user not found" });
