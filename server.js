@@ -24,6 +24,10 @@ app.use(express.json());
 app.use(bodyParser.json());
 
 app.use("/", routes);
+app.get("/", (req, res) => {
+  res.send("<h1>Your application is deployed on Kubernetes</h1>");
+});
+
 
 mongoose
   .connect("mongodb+srv://anuragyadav:xaFGgUXPDJe5YLUW@cluster0.ykk6k.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")

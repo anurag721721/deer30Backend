@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dear30-backend-deployment
+  labels:
+    app: dear30-backend
+spec:
+  replicas: 6
+  selector:
+    matchLabels:
+      app: dear30-backend
+  template:
+    metadata:
+      labels:
+        app: dear30-backend
+    spec:
+      containers:
+        - name: dear30-backendt
+          image: amazingatul/dear30-backend:v2
+          ports:
+            - containerPort: 9876
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dear30-backend-service
+spec:
+  selector:
+    app: dear30-backend
+  ports:
+    - protocol: TCP
+      port: 9876
+      targetPort: 9876
+  type: LoadBalancer
+
+
+
