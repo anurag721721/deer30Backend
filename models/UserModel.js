@@ -35,7 +35,7 @@ const userSchema = new mongoose.Schema(
     reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: "Review" }],
     userType: {
       type: String,
-      enum: ["Customer", "Vendor", "Admin"],
+      enum: ["customer", "vendor", "admin"],
       required: true,
     },
     verificationCodeExpires: {
