@@ -190,7 +190,7 @@ const verifyOtp = async (req, res) => {
   try {
     const { email, otp } = req.body;
 
-    const users = await User.find({ email });
+    const users = await User.findOne({ email});
     if (!users) return res.status(404).send({ message: "user not found" });
     if (users.verificationCode === otp) {
       return res.status(200).json({
@@ -209,21 +209,25 @@ const verifyOtp = async (req, res) => {
 };
 const changePassword = async (req, res) => {
   try {
-    const { password } = req.body;
-    const { userId } = req.params;
+    const { email, password } = req.body;
 
-    const users = await User.findById({ _id: userId });
-    if (!users) return res.status(404).send({ message: "user not found" });
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email and password are required." });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    users.password = hashedPassword;
+    user.password = hashedPassword;
+    await user.save();
 
-    const updated = await users.save();
-    if (updated) {
-      res
-        .status(200)
-        .json({ success: true, message: "Password changed successfully" });
-    }
+    res.status(200).json({
+      success: true,
+      message: "Password changed successfully.",
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
