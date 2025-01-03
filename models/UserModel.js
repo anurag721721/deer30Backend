@@ -32,10 +32,11 @@ const userSchema = new mongoose.Schema(
     verificationCode: {
       type: String,
     },
+    reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: "Review" }],
     userType: {
       type: String,
       enum: ["Customer", "Vendor", "Admin"],
-      required:true
+      required: true,
     },
     verificationCodeExpires: {
       type: Date,
