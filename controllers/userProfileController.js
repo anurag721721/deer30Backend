@@ -95,7 +95,7 @@ const addAddress = async (req, res) => {
       addressLine,
       city,
       state,
-      postalCode,
+      pinCode,
       country,
       phoneNumber,
     } = req.body;
@@ -114,7 +114,7 @@ const addAddress = async (req, res) => {
       addressLine,
       city,
       state,
-      postalCode,
+      pinCode,
       country,
       phoneNumber,
     });
