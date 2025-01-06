@@ -58,5 +58,54 @@ const getAllProduct = async (req, res) => {
     });
   }
 };
+const getLatestProduct = async (req, res) => {
+  try {
+    const allProducts = await Product.find({}).sort({ createdAt: -1 }).limit(10);
+    if (!allProducts) {
+      return res.status(400).json({
+        success: false,
+        message: "No products found",
+      });
+    }
+    // Respond with success
+    return res.status(201).json({
+      success: true,
+      message: "All Products fetched successfully.",
+      product: allProducts,
+    });
+  } catch (error) {
+    console.error("Error while fetching product:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error.",
+      error: error.message,
+    });
+  }
+};
+const getProductDetailsbyId = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const product = await Product.findById(id);
+      if (!product) {
+        return res.status(400).json({
+          success: false,
+          message: "No product Details found for the requested Product",
+        });
+      }
+      // Respond with success
+      return res.status(201).json({
+        success: true,
+        message: "Product Details fetched successfully.",
+        product: product,
+      });
+    } catch (error) {
+      console.error("Error while fetching product details:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Internal server error.",
+        error: error.message,
+      });
+    }
+  };
 
-module.exports = { createProduct, getAllProduct };
+module.exports = { createProduct, getAllProduct ,getLatestProduct,getProductDetailsbyId};
