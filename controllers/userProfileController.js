@@ -1,5 +1,6 @@
 const User = require("../models/UserModel");
 const Address = require("../models/addressModel");
+const bcrypt = require("bcrypt");
 
 const updateProfile = async (req, res) => {
   try {
@@ -38,6 +39,54 @@ const updateProfile = async (req, res) => {
     });
   }
 };
+
+const updatePassword = async (req, res) => {
+  try {
+    const { email, password, newPassword } = req.body;
+
+    // Validate input fields
+    if (!email || !password || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "Email, password, and new password are required",
+      });
+    }
+
+    // Find the user by email
+    const existingUser = await User.findOne({ email });
+    if (!existingUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Compare the provided password with the stored hashed password
+    const isMatch = await bcrypt.compare(password, existingUser.password);
+    if (!isMatch) {
+      return res.status(403).json({
+        success: false,
+        message: "Incorrect password",
+      });
+    }
+
+    // Hash the new password and update the user's password
+    existingUser.password = await bcrypt.hash(newPassword, 10);
+    await existingUser.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Password updated successfully",
+    });
+  } catch (error) {
+    console.error("Error in updatePassword:", error); // Log the error for debugging
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred while updating the password",
+    });
+  }
+};
+
 const addAddress = async (req, res) => {
   try {
     const {
@@ -115,39 +164,37 @@ const getAllAddressOfUser = async (req, res) => {
   }
 };
 const updateAddress = async (req, res) => {
-    try {
-      const { id } = req.params;
-      const updateData = req.body;
-  
-      // Update only the fields provided in the request body
-      const updatedAddress = await Address.findByIdAndUpdate(
-        id,
-        { $set: updateData },
-        { new: true } 
-      );
-  
-      if (!updatedAddress) {
-        return res
-          .status(404)
-          .json({ success: false, message: "Address not found" });
-      }
-  
+  try {
+    const { id } = req.params;
+    const updateData = req.body;
+
+    // Update only the fields provided in the request body
+    const updatedAddress = await Address.findByIdAndUpdate(
+      id,
+      { $set: updateData },
+      { new: true }
+    );
+
+    if (!updatedAddress) {
       return res
-        .status(200)
-        .json({
-          success: true,
-          address: updatedAddress,
-          message: "Address updated successfully",
-        });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({
-        success: false,
-        message: "An error occurred while updating the address",
-      });
+        .status(404)
+        .json({ success: false, message: "Address not found" });
     }
-  };
-  
+
+    return res.status(200).json({
+      success: true,
+      address: updatedAddress,
+      message: "Address updated successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred while updating the address",
+    });
+  }
+};
+
 const deleteAddress = async (req, res) => {
   try {
     const { addressId } = req.params;
@@ -162,7 +209,7 @@ const deleteAddress = async (req, res) => {
     }
 
     // Also, remove the address reference from the user
-    const user = await User.findOne({ address: addressId});
+    const user = await User.findOne({ address: addressId });
     if (user) {
       user.address.pull(addressId); // Removes the address from the user's address array
       await user.save();
@@ -181,6 +228,7 @@ const deleteAddress = async (req, res) => {
 };
 module.exports = {
   updateProfile,
+  updatePassword,
   addAddress,
   getAllAddressOfUser,
   updateAddress,
