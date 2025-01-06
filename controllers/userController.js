@@ -149,7 +149,7 @@ const userLogin = async (req, res) => {
     console.error("Error in userSignUp:", error); // Log the error for debugging
     return res.status(500).json({
       success: false,
-      message: "An error occurred during login. Please try again later.",
+      message: error.message,
     });
   }
 };
