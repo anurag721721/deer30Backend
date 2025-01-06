@@ -2,7 +2,11 @@ const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
   {
-    fullName: {
+    firstName: {
+      type: String,
+      required: true,
+    },
+    lastName: {
       type: String,
       required: true,
     },
@@ -22,6 +26,12 @@ const userSchema = new mongoose.Schema(
         },
         message: (props) => `${props.value} is not a valid mobile number!`,
       },
+    },
+    gender: {
+      type: String,
+    },
+    dob: {
+      type: String,
     },
     password: {
       type: String,
