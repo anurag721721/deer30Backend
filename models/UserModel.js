@@ -27,6 +27,7 @@ const userSchema = new mongoose.Schema(
         message: (props) => `${props.value} is not a valid mobile number!`,
       },
     },
+
     gender: {
       type: String,
     },
@@ -42,9 +43,11 @@ const userSchema = new mongoose.Schema(
     verificationCode: {
       type: String,
     },
+    address: [{ type: mongoose.Schema.Types.ObjectId, ref: "Address" }],
     reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: "Review" }],
     userType: {
       type: String,
+
       enum: ["customer", "vendor", "admin"],
       required: true,
     },
