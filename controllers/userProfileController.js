@@ -114,34 +114,40 @@ const getAllAddressOfUser = async (req, res) => {
     });
   }
 };
-const updateAdress = async (req, res) => {
-  try {
-    const { addressId } = req.params;
-    const { name, addressLine, city, state, postalCode, country, phoneNumber } =
-      req.body;
-
-    // Update the address
-    const updatedAddress = await Address.findByIdAndUpdate(
-      addressId,
-      { name, addressLine, city, state, postalCode, country, phoneNumber },
-      { new: true } // Return the updated document
-    );
-
-    if (!updatedAddress) {
+const updateAddress = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updateData = req.body;
+  
+      // Update only the fields provided in the request body
+      const updatedAddress = await Address.findByIdAndUpdate(
+        id,
+        { $set: updateData },
+        { new: true } 
+      );
+  
+      if (!updatedAddress) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Address not found" });
+      }
+  
       return res
-        .status(404)
-        .json({ success: false, message: "Address not found" });
+        .status(200)
+        .json({
+          success: true,
+          address: updatedAddress,
+          message: "Address updated successfully",
+        });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({
+        success: false,
+        message: "An error occurred while updating the address",
+      });
     }
-
-    return res.status(200).json({ success: true, address: updatedAddress,message:"Address updated successfully" });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      success: false,
-      message: "An error occurred while updating the address",
-    });
-  }
-};
+  };
+  
 const deleteAddress = async (req, res) => {
   try {
     const { addressId } = req.params;
@@ -177,6 +183,6 @@ module.exports = {
   updateProfile,
   addAddress,
   getAllAddressOfUser,
-  updateAdress,
+  updateAddress,
   deleteAddress,
 };
