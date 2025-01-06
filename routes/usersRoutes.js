@@ -1,5 +1,5 @@
 const express=require('express')
-const {userSignUp,userLogin, userVerify, forgetPassword, changePassword, verifyOtp}=require('../controllers/userController')
+const {userSignUp,userLogin, userVerify, forgetPassword, changePassword, verifyOtp, }=require('../controllers/userController')
 const router = express.Router();
 
 router.post('/signup', userSignUp);

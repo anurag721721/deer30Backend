@@ -12,7 +12,7 @@ const sendVerificationEmail = async (email, verificationCode) => {
 
 const userSignUp = async (req, res) => {
   try {
-    const { fullName, password, email, userType } = req.body;
+    const { firstName,lastName, password, email, userType } = req.body;
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -24,7 +24,7 @@ const userSignUp = async (req, res) => {
     }
 
     // Validate inputs
-    if (!fullName || !password || !email || !userType) {
+    if (!firstName || !password || !email || !userType) {
       return res.status(403).json({
         success: false,
         message: "Please fill all the fields",
@@ -43,7 +43,7 @@ const userSignUp = async (req, res) => {
 
     // Create and save the new user
     const newUser = new User({
-      fullName,
+      firstName,lastName,
       email,
       userType,
       password: hashedPassword,
@@ -153,6 +153,7 @@ const userLogin = async (req, res) => {
     });
   }
 };
+
 const forgetPassword = async (req, res) => {
   try {
     const { email } = req.body;
@@ -232,6 +233,7 @@ const changePassword = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 
 module.exports = {
   userSignUp,
