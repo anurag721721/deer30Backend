@@ -2,44 +2,28 @@ const mongoose = require("mongoose");
 
 const reviewSchema = new mongoose.Schema(
   {
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true, 
-    },
     product: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Product",
+      ref: "Product", // Reference to the Product model
+      required: true,
+    },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User", // Reference to the User model
       required: true,
     },
     rating: {
       type: Number,
       required: true,
-      min: 1, 
-      max: 5, 
-      validate: {
-        validator: Number.isInteger,
-        message: "{VALUE} is not an integer value for rating.",
-      },
+      min: 1, // Minimum rating value
+      max: 5, // Maximum rating value
     },
-    reviewText: {
-      type: String,
+    comment: {
+      type: String, // Optional user comment
       trim: true,
     },
-    media: [
-      {
-        type: String, 
-      },
-    ],
-    status: {
-      type: String,
-      enum: ["approved", "pending", "rejected"],
-      default: "pending", // For moderation
-    },
   },
-  {
-    timestamps: true, // Automatically add createdAt and updatedAt fields
-  }
+  { timestamps: true }
 );
 
 module.exports = mongoose.model("Review", reviewSchema);

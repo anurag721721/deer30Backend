@@ -4,7 +4,11 @@ const Product = require("../models/productModel");
 const createProduct = async (req, res) => {
   try {
     const { productName, price, productDescription, specification } = req.body;
-
+    console.log(productName);
+    let imageUrl = [];
+    if (req.fileLocations) {
+      imageUrl = req.fileLocations;
+    }
     if (!productName || !price || !productDescription) {
       return res.status(400).json({
         success: false,
@@ -15,6 +19,7 @@ const createProduct = async (req, res) => {
     const newProd = await Product.create({
       productName,
       price,
+      images:imageUrl,
       productDescription,
       specification,
     });
@@ -60,7 +65,9 @@ const getAllProduct = async (req, res) => {
 };
 const getLatestProduct = async (req, res) => {
   try {
-    const allProducts = await Product.find({}).sort({ createdAt: -1 }).limit(10);
+    const allProducts = await Product.find({})
+      .sort({ createdAt: -1 })
+      .limit(10);
     if (!allProducts) {
       return res.status(400).json({
         success: false,
@@ -83,29 +90,34 @@ const getLatestProduct = async (req, res) => {
   }
 };
 const getProductDetailsbyId = async (req, res) => {
-    try {
-      const { id } = req.params;
-      const product = await Product.findById(id);
-      if (!product) {
-        return res.status(400).json({
-          success: false,
-          message: "No product Details found for the requested Product",
-        });
-      }
-      // Respond with success
-      return res.status(201).json({
-        success: true,
-        message: "Product Details fetched successfully.",
-        product: product,
-      });
-    } catch (error) {
-      console.error("Error while fetching product details:", error);
-      return res.status(500).json({
+  try {
+    const { id } = req.params;
+    const product = await Product.findById(id);
+    if (!product) {
+      return res.status(400).json({
         success: false,
-        message: "Internal server error.",
-        error: error.message,
+        message: "No product Details found for the requested Product",
       });
     }
-  };
+    // Respond with success
+    return res.status(201).json({
+      success: true,
+      message: "Product Details fetched successfully.",
+      product: product,
+    });
+  } catch (error) {
+    console.error("Error while fetching product details:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error.",
+      error: error.message,
+    });
+  }
+};
 
-module.exports = { createProduct, getAllProduct ,getLatestProduct,getProductDetailsbyId};
+module.exports = {
+  createProduct,
+  getAllProduct,
+  getLatestProduct,
+  getProductDetailsbyId,
+};
